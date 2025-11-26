@@ -66,6 +66,10 @@ function parseStepsTable(steps: string) {
     return rows.length > 0 ? rows : null;
 }
 
+// Force dynamic rendering and disable caching to always show fresh data
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export default async function RecipePage({
     params,
 }: {
@@ -108,9 +112,18 @@ export default async function RecipePage({
 
                 {/* Recipe Header */}
                 <div className="bg-white rounded-2xl shadow-xl p-8 mb-6 border border-orange-100">
-                    <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent pb-2">
-                        {recipe.title}
-                    </h1>
+                    <div className="flex items-start justify-between mb-4">
+                        <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent pb-2">
+                            {recipe.title}
+                        </h1>
+                        <Link
+                            href={`/edit-recipe/${recipe.id}`}
+                            className="flex-shrink-0 ml-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:from-blue-600 hover:to-blue-700 transition-all shadow-md hover:shadow-lg flex items-center gap-2"
+                        >
+                            <span>✏️</span>
+                            Edit Recipe
+                        </Link>
+                    </div>
 
                     <div className="flex flex-wrap gap-2 mb-6">
                         <span className="bg-gradient-to-r from-orange-500 to-amber-500 text-white px-4 py-2 rounded-full text-sm font-semibold shadow-md">
