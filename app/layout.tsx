@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Playfair_Display, Lato } from "next/font/google";
+import { Playfair_Display, Lato, Dancing_Script } from "next/font/google";
 import "./globals.css";
 
 const playfair = Playfair_Display({
@@ -10,6 +10,11 @@ const playfair = Playfair_Display({
 const lato = Lato({
   weight: ["400", "700"],
   variable: "--font-body",
+  subsets: ["latin"],
+});
+
+const dancingScript = Dancing_Script({
+  variable: "--font-handwriting",
   subsets: ["latin"],
 });
 
@@ -26,7 +31,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${playfair.variable} ${lato.variable} antialiased bg-stone-50 text-stone-800`}
+        className={`${playfair.variable} ${lato.variable} ${dancingScript.variable} antialiased bg-stone-50 text-stone-800`}
       >
         {children}
       </body>

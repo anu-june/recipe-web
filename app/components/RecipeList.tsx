@@ -39,9 +39,9 @@ export default function RecipeList({ initialRecipes }: { initialRecipes: RecipeL
     }, [groupedRecipes]);
 
     return (
-        <div className="space-y-12">
+        <div className="space-y-6">
             {/* Search Bar */}
-            <div className="relative max-w-lg mx-auto">
+            <div className="relative max-w-xs ml-auto">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                     <svg
                         className="h-4 w-4 text-sage-400"
@@ -78,21 +78,21 @@ export default function RecipeList({ initialRecipes }: { initialRecipes: RecipeL
             )}
 
             {/* Recipe Groups */}
-            <div className="space-y-16">
+            <div className="space-y-10">
                 {sortedCategories.map((category) => (
                     <section key={category}>
-                        <h2 className="text-2xl font-bold text-sage-900 mb-6 font-serif border-b border-sage-200 pb-2 inline-block pr-8">
+                        <h2 className="text-3xl font-bold text-sage-900 mb-4 font-serif border-b border-sage-200 pb-1 inline-block pr-8">
                             {category}
                         </h2>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             {groupedRecipes[category].map((recipe) => (
                                 <Link
                                     key={recipe.id}
                                     href={`/recipe/${recipe.id}`}
-                                    className="group block bg-white border border-sage-200 hover:border-terracotta-300 transition-all duration-500"
+                                    className="group block bg-white border border-sage-200 hover:border-terracotta-300 hover:shadow-md transition-all duration-300 hover:-translate-y-1"
                                 >
-                                    <div className="p-8">
-                                        <h3 className="text-3xl font-bold text-sage-900 mb-3 group-hover:text-terracotta-600 transition-colors font-serif">
+                                    <div className="p-5">
+                                        <h3 className="text-2xl font-bold text-sage-900 group-hover:text-terracotta-600 transition-colors font-serif">
                                             {recipe.title}
                                         </h3>
                                         {/* Category tag removed from card since it's now in the section header */}

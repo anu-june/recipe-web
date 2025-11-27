@@ -1,7 +1,7 @@
 // app/page.tsx
 import { supabase } from '@/lib/supabaseClient';
-import Link from 'next/link';
 import RecipeList from './components/RecipeList';
+import ScrollAwareAddButton from './components/ScrollAwareAddButton';
 import type { RecipeListItem } from '@/lib/types';
 
 export const revalidate = 0; // Disable static caching to show new recipes immediately
@@ -16,6 +16,9 @@ export default async function Home() {
 
   return (
     <main className="min-h-screen bg-sage-50">
+      {/* Scroll-Aware Add Recipe Button */}
+      <ScrollAwareAddButton />
+
       {/* Hero Section with Background Image */}
       <div className="relative h-64 md:h-80 w-full overflow-hidden">
         <div
@@ -36,16 +39,7 @@ export default async function Home() {
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-4 py-12">
-        {/* Action Bar */}
-        <div className="flex justify-center mb-12">
-          <Link
-            href="/add-recipe"
-            className="inline-block bg-terracotta-500 text-white px-8 py-3 rounded-none font-medium hover:bg-terracotta-600 transition-all tracking-wide uppercase text-sm shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
-          >
-            Add New Recipe
-          </Link>
-        </div>
+      <div className="max-w-6xl mx-auto px-4 py-12">
 
         {error && (
           <div className="bg-terracotta-50 border border-terracotta-200 p-4 mb-8 text-center">
