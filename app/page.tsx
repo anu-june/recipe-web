@@ -2,12 +2,7 @@
 import { supabase } from '@/lib/supabaseClient';
 import Link from 'next/link';
 import RecipeList from './components/RecipeList';
-
-type Recipe = {
-  id: string;
-  title: string;
-  category: string | null;
-};
+import type { RecipeListItem } from '@/lib/types';
 
 export default async function Home() {
   const { data, error } = await supabase
@@ -15,9 +10,7 @@ export default async function Home() {
     .select('id, title, category')
     .eq('is_published', true)
     .order('created_at', { ascending: false });
-
-
-  const recipes = (data ?? []) as Recipe[];
+  const recipes = (data ?? []) as RecipeListItem[];
 
   return (
     <main className="min-h-screen bg-sage-50">

@@ -1,0 +1,25 @@
+// Shared type definitions for the recipe application
+
+export type Recipe = {
+    id: string;
+    title: string;
+    slug: string;
+    category: string;
+    cuisine: string | null;
+    servings: string | null;
+    prep_time_minutes: number | null;
+    cook_time_minutes: number | null;
+    total_time_minutes: number | null;
+    ingredients: string;
+    steps: string;
+    notes: string | null;
+    source_url: string | null;
+    is_published: boolean;
+    created_at?: string;
+};
+
+// For list views that don't need all fields
+export type RecipeListItem = Pick<Recipe, 'id' | 'title' | 'category'>;
+
+// For recipe detail view
+export type RecipeDetail = Omit<Recipe, 'slug' | 'is_published' | 'created_at'>;

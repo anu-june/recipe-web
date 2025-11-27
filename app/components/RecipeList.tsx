@@ -1,41 +1,42 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import Link from 'next/link';
+import type { RecipeListItem } from '@/lib/types';
 
-type Recipe = {
-    id: string;
-    title: string;
-    category: string | null;
-};
-
-export default function RecipeList({ initialRecipes }: { initialRecipes: Recipe[] }) {
+export default function RecipeList({ initialRecipes }: { initialRecipes: RecipeListItem[] }) {
     const [searchQuery, setSearchQuery] = useState('');
 
-    const filteredRecipes = initialRecipes.filter((recipe) => {
-        const query = searchQuery.toLowerCase();
-        return (
-            recipe.title.toLowerCase().includes(query) ||
-            (recipe.category && recipe.category.toLowerCase().includes(query))
-        );
-    });
+    const filteredRecipes = useMemo(() => {
+        return initialRecipes.filter((recipe) => {
+            const query = searchQuery.toLowerCase();
+            return (
+                recipe.title.toLowerCase().includes(query) ||
+                (recipe.category && recipe.category.toLowerCase().includes(query))
+            );
+        });
+    }, [initialRecipes, searchQuery]);
 
     // Group recipes by category
-    const groupedRecipes = filteredRecipes.reduce((acc, recipe) => {
-        const category = recipe.category || 'Uncategorized';
-        if (!acc[category]) {
-            acc[category] = [];
-        }
-        acc[category].push(recipe);
-        return acc;
-    }, {} as Record<string, Recipe[]>);
+    const groupedRecipes = useMemo(() => {
+        return filteredRecipes.reduce((acc, recipe) => {
+            const category = recipe.category || 'Uncategorized';
+            if (!acc[category]) {
+                acc[category] = [];
+            }
+            acc[category].push(recipe);
+            return acc;
+        }, {} as Record<string, RecipeListItem[]>);
+    }, [filteredRecipes]);
 
     // Sort categories alphabetically, but keep "Uncategorized" last if it exists
-    const sortedCategories = Object.keys(groupedRecipes).sort((a, b) => {
-        if (a === 'Uncategorized') return 1;
-        if (b === 'Uncategorized') return -1;
-        return a.localeCompare(b);
-    });
+    const sortedCategories = useMemo(() => {
+        return Object.keys(groupedRecipes).sort((a, b) => {
+            if (a === 'Uncategorized') return 1;
+            if (b === 'Uncategorized') return -1;
+            return a.localeCompare(b);
+        });
+    }, [groupedRecipes]);
 
     return (
         <div className="space-y-12">

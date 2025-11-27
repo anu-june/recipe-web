@@ -4,11 +4,14 @@ import { useState } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { formatIngredients, formatSteps } from '@/lib/recipeFormatters';
+import { validateRecipe, ValidationErrors } from '@/lib/validation';
 
 export default function AddRecipePage() {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const [validationErrors, setValidationErrors] = useState<ValidationErrors>({});
 
     const [formData, setFormData] = useState({
         title: '',
@@ -26,57 +29,7 @@ export default function AddRecipePage() {
         is_published: true
     });
 
-    // Format ingredients to consistent "Ingredient - Quantity" format
-    const formatIngredients = (text: string): string => {
-        const lines = text.split('\n').filter(line => line.trim());
-
-        return lines.map(line => {
-            const trimmed = line.trim();
-
-            // Try to detect separator and split
-            let ingredient = '';
-            let quantity = '';
-
-            // Check for various separators: - : | or multiple spaces
-            if (trimmed.includes(' - ')) {
-                [ingredient, quantity] = trimmed.split(' - ', 2);
-            } else if (trimmed.includes(':')) {
-                [ingredient, quantity] = trimmed.split(':', 2);
-            } else if (trimmed.includes('|')) {
-                [ingredient, quantity] = trimmed.split('|', 2);
-            } else if (trimmed.match(/\s{2,}/)) {
-                // Multiple spaces
-                [ingredient, quantity] = trimmed.split(/\s{2,}/, 2);
-            } else {
-                // Try to split on first dash without spaces
-                const dashIndex = trimmed.indexOf('-');
-                if (dashIndex > 0) {
-                    ingredient = trimmed.substring(0, dashIndex);
-                    quantity = trimmed.substring(dashIndex + 1);
-                } else {
-                    // No clear separator, return as-is
-                    return trimmed;
-                }
-            }
-
-            return `${ingredient.trim()} - ${quantity.trim()}`;
-        }).join('\n');
-    };
-
-    // Format steps to consistent numbered format "1. Step description"
-    const formatSteps = (text: string): string => {
-        const lines = text.split('\n').filter(line => line.trim());
-
-        return lines.map((line, index) => {
-            const trimmed = line.trim();
-
-            // Remove existing numbering if present
-            const withoutNumber = trimmed.replace(/^(\d+)[\.):\s]+/, '');
-
-            // Add consistent numbering
-            return `${index + 1}. ${withoutNumber}`;
-        }).join('\n');
-    };
+    // Formatters are now imported from shared utilities
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value, type } = e.target;
@@ -108,6 +61,28 @@ export default function AddRecipePage() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
+        setError('');
+        setValidationErrors({});
+
+        // Validate form
+        const validation = validateRecipe({
+            title: formData.title,
+            category: formData.category,
+            cuisine: formData.cuisine,
+            servings: formData.servings,
+            prep_time_minutes: parseInt(formData.prep_time_minutes) || null,
+            cook_time_minutes: parseInt(formData.cook_time_minutes) || null,
+            total_time_minutes: parseInt(formData.total_time_minutes) || null,
+            ingredients: formData.ingredients,
+            steps: formData.steps
+        });
+
+        if (!validation.isValid) {
+            setValidationErrors(validation.errors);
+            setError('Please fix the errors below');
+            setLoading(false);
+            return;
+        }
         setError('');
 
         try {
