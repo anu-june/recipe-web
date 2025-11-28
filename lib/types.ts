@@ -40,4 +40,5 @@ export type ParsedRecipe = {
     ingredients: string;
     steps: string;
     notes: string | null;
+    source_url?: string | null;
 };

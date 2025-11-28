@@ -40,7 +40,7 @@ async function testYouTube() {
             try {
                 const description = data?.contents?.twoColumnWatchNextResults?.results?.results?.contents?.[1]?.videoSecondaryInfoRenderer?.attributedDescription?.content;
                 console.log('Description (ytInitialData):', description ? description.substring(0, 200) : 'NOT FOUND IN PATH');
-            } catch (e) {
+            } catch (e: any) {
                 console.log('Error navigating ytInitialData:', e.message);
             }
         } else {
