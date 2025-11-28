@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import { formatIngredients, formatSteps } from '@/lib/recipeFormatters';
 import { validateRecipe, ValidationErrors } from '@/lib/validation';
 import RecipeImporter from '../components/RecipeImporter';
+import type { ParsedRecipe } from '@/lib/types';
 
 export default function AddRecipePage() {
     const router = useRouter();
@@ -32,7 +33,7 @@ export default function AddRecipePage() {
 
     // Formatters are now imported from shared utilities
 
-    const handleRecipeParsed = (recipe: any, sourceUrl?: string) => {
+    const handleRecipeParsed = (recipe: ParsedRecipe, sourceUrl?: string) => {
         setFormData(prev => ({
             ...prev,
             title: recipe.title || '',

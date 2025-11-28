@@ -1,19 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-
-type ParsedRecipe = {
-    title: string;
-    category: string | null;
-    cuisine: string | null;
-    servings: string | null;
-    prep_time_minutes: number | null;
-    cook_time_minutes: number | null;
-    total_time_minutes?: number | null;
-    ingredients: string;
-    steps: string;
-    notes: string | null;
-};
+import type { ParsedRecipe } from '@/lib/types';
 
 type RecipeImporterProps = {
     onRecipeParsed: (recipe: ParsedRecipe, sourceUrl?: string) => void;

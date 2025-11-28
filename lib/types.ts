@@ -27,3 +27,17 @@ export type RecipeListItem = {
 
 // For recipe detail view
 export type RecipeDetail = Omit<Recipe, 'slug' | 'is_published' | 'created_at'>;
+
+// For AI parsed recipe response
+export type ParsedRecipe = {
+    title: string;
+    category: string | null;
+    cuisine: string | null;
+    servings: string | null;
+    prep_time_minutes: number | null;
+    cook_time_minutes: number | null;
+    total_time_minutes?: number | null;
+    ingredients: string;
+    steps: string;
+    notes: string | null;
+};

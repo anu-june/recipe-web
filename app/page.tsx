@@ -1,4 +1,4 @@
-// app/page.tsx
+import Image from 'next/image';
 import { supabase } from '@/lib/supabaseClient';
 import RecipeList from './components/RecipeList';
 import ScrollAwareAddButton from './components/ScrollAwareAddButton';
@@ -21,15 +21,16 @@ export default async function Home() {
 
       {/* Hero Section with Background Image */}
       <div className="relative h-64 md:h-80 w-full overflow-hidden">
-        <div
-          className="absolute inset-0 bg-center bg-no-repeat"
-          style={{
-            backgroundImage: "url('/header-bg.png')",
-            backgroundSize: '100% auto'
-          }}
-        ></div>
+        <Image
+          src="/header-bg.png"
+          alt="Recipe Collection Header"
+          fill
+          priority
+          className="object-cover"
+          quality={90}
+        />
         <div className="absolute inset-0 bg-black/30"></div> {/* Overlay for text readability */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
+        <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4 relative z-10">
           <h1 className="text-5xl md:text-7xl font-bold text-white tracking-tight font-serif drop-shadow-lg mb-4">
             Recipe Collection
           </h1>

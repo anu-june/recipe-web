@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
+
 
 export async function POST(request: NextRequest) {
     try {
@@ -14,7 +14,18 @@ export async function POST(request: NextRequest) {
             );
         }
 
+        // Validate API Key
+        const apiKey = process.env.GEMINI_API_KEY;
+        if (!apiKey) {
+            console.error('GEMINI_API_KEY is missing in environment variables');
+            return NextResponse.json(
+                { error: 'Server configuration error. Please contact support.' },
+                { status: 500 }
+            );
+        }
+
         // Get Gemini model
+        const genAI = new GoogleGenerativeAI(apiKey);
         const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
 
         // Check if input is a URL
