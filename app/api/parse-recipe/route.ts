@@ -44,27 +44,44 @@ export async function POST(request: NextRequest) {
                     if (ytResponse.ok) {
                         const html = await ytResponse.text();
 
-                        // Extract title from meta tag
-                        const titleMatch = html.match(/<meta name="title" content="([^"]+)"/);
+                        // Extract title from Open Graph meta tag (more reliable)
+                        const titleMatch = html.match(/<meta property="og:title" content="([^"]+)"/);
                         const title = titleMatch ? titleMatch[1] : '';
 
-                        // Extract description from meta tag
-                        const descMatch = html.match(/<meta name="description" content="([^"]+)"/);
-                        const description = descMatch ? descMatch[1] : '';
+                        // Extract full description from ytInitialData (YouTube's embedded JSON)
+                        let fullDescription = '';
 
-                        // Also try to get more detailed description from JSON-LD or other sources
-                        const jsonMatch = html.match(/<script[^>]*type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/);
-                        let fullDescription = description;
+                        // YouTube embeds data in: var ytInitialData = {...};
+                        const ytDataMatch = html.match(/var ytInitialData = ({[\s\S]+?});/);
 
-                        if (jsonMatch) {
+                        if (ytDataMatch) {
                             try {
-                                const jsonData = JSON.parse(jsonMatch[1]);
-                                if (jsonData.description) {
-                                    fullDescription = jsonData.description;
+                                const ytData = JSON.parse(ytDataMatch[1]);
+
+                                // Navigate through YouTube's data structure to find description
+                                const videoDetails = ytData?.contents?.twoColumnWatchNextResults?.results?.results?.contents;
+
+                                if (videoDetails && Array.isArray(videoDetails)) {
+                                    // Find the videoSecondaryInfoRenderer which contains the description
+                                    for (const item of videoDetails) {
+                                        if (item?.videoSecondaryInfoRenderer?.attributedDescription) {
+                                            fullDescription = item.videoSecondaryInfoRenderer.attributedDescription.content;
+                                            break;
+                                        }
+                                    }
                                 }
-                            } catch (e) {
-                                // Ignore JSON parse errors
+
+                                console.log('Extracted YouTube description from ytInitialData, length:', fullDescription.length);
+                            } catch (parseError) {
+                                console.warn('Failed to parse ytInitialData:', parseError);
                             }
+                        }
+
+                        // Fallback to meta description if ytInitialData extraction failed
+                        if (!fullDescription) {
+                            const metaDescMatch = html.match(/<meta property="og:description" content="([^"]+)"/);
+                            fullDescription = metaDescMatch ? metaDescMatch[1] : '';
+                            console.log('Using meta description as fallback, length:', fullDescription.length);
                         }
 
                         if (fullDescription) {
@@ -201,13 +218,16 @@ INSTRUCTIONS:
 
 FORMATTING RULES:
 
+
 INGREDIENTS:
 - Format each line as: "Ingredient – quantity" (Use an en-dash '–' separator).
-- Standardize units (cups, tbsp, tsp, grams, ml).
+- Standardize units: PREFER cups, tbsp, tsp for liquids. Use grams for solids when metric.
+- Convert mL to cups (240 mL = 1 cup, 120 mL = 1/2 cup, 60 mL = 1/4 cup, etc.).
 - List ALL ingredients in a single flat list.
 - EXCEPTION: If there are marination ingredients, list "Marination" as a header line, then list marination ingredients below it. Otherwise, NO headers like "For the sauce" or "A/B/C".
 - Example: "All-purpose flour – 2 cups"
 - Example: "Vanilla extract – 1 tsp"
+- Example: "Water – 1 cup" (NOT "Water – 240 mL")
 - DO NOT output "null" or "undefined" for quantity. If quantity is missing, just output "Ingredient – ".
 
 STEPS:
@@ -218,7 +238,8 @@ STEPS:
 - NO bold text anywhere.
 
 NOTES:
-- Add only useful tips or variations from the original recipe.
+- Add useful tips, variations, or optional upgrades from the original recipe.
+- If there are "optional additions", "variations", or "upgrades" mentioned, include them here.
 - If the input was a URL, include "Source: [URL]" at the end of the notes.
 - Remove duplicate or conflicting information.
 
